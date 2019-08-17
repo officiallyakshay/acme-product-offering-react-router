@@ -57,11 +57,15 @@
       }
 
       const Products = ({ products, companies, offerings }) => {
+        // console.log(products, companies)
+
         return (
           <div>
             <h1>Products</h1>
             {
-              products.map( product => <ul key={ product.id }> <li> { product.name } </li> <h4> { `$ ${product.suggestedPrice}.00` } </h4> <h4> { product.description } </h4> <h4> { ` Offered By: ${companies.map( company => offerings.map(offering => offering.companyId === company.id))} ` } </h4> </ul>)
+              products.map( product =>
+                 <ul key={ product.id }> <li> { product.name } </li> <h4> { `$ ${product.suggestedPrice}.00` } </h4> <h4> { product.description } </h4> <h4> { ` Offered By: ${offerings.map( offering => companies.find(company => offering.companyId === company.id && offering.productId === product.id )console.log(offering))} ` } </h4> </ul>
+              )
             }
           </div>
         );
@@ -76,7 +80,7 @@
             offerings: []
           }
         }
-      
+
         componentDidMount() {
           const url = [
             'https://acme-users-api-rev.herokuapp.com/api/companies',
@@ -94,7 +98,7 @@
               <Route render={ ({ location }) => <Nav path={ location.pathname } products = { products } companies = { companies } /> } />
                 <Switch>
                   <Route path = '/companies' render={ () => <Companies companies={companies} /> } />
-                  <Route path = '/products' render={ () => <Products products={products} /> } />
+                  <Route path = '/products' render={ () => <Products products={products} companies={companies} offerings={offerings}/> } />
                   <Redirect to = '/companies' />
                 </Switch>
             </HashRouter>
