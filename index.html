@@ -7,15 +7,100 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-router-dom/5.0.1/react-router-dom.js"></script>
   <style>
+    body {
+      font-family: Geneva, Tahoma, sans-serif;
+    }
+    .nav {
+      display: flex;
+      justify-content: space-around;
+      background-color: tomato;
+      padding: 1rem;
+      font-weight: 50%;
+    }
+    .selected {
+      background-color: tomato;
+      color: white;
+      padding: 1rem;
+    }
   </style>
   </head>
     <body>
-
       <div id='root'></div>
-
       <script type='text/babel'>
 
+        const { render } = ReactDOM
+        const { createElement, Component } = React;
+        const { HashRouter, Link, Route, Switch, Redirect } = ReactRouterDOM;
 
+      const Nav = ( { products, companies } ) => {
+        const path = location.pathname;
+        return (
+          <div>
+            <div className='nav'>
+              <h1>Acme Offerings* React</h1>
+              <Link to='/products' className={ path === '/products' ? 'selected' : ''}>Products</Link>
+              <Link to='/companies' className={ path === '/companies' ? 'selected' : ''}>Companies</Link>
+            </div>
+          </div>
+        );
+      }
+
+      const Companies = ({ companies }) => {
+        return (
+          <div>
+            <h1>Companies</h1>
+            {
+              companies.map( company => <li key={ company.id }> { company.name }</li> )
+            }
+          </div>
+        );
+      }
+
+      const Products = ({ products }) => {
+        return (
+          <div>
+            <h1>Products</h1>
+            {
+              products.map( product => <li key={ product.id }> { product.name }</li> )
+            }
+          </div>
+        );
+      }
+
+      class App extends Component {
+        constructor() {
+          super();
+          this.state = {
+            companies: [],
+            products: [],
+            offerings: []
+          }
+        }
+      
+        componentDidMount() {
+          const url = [
+            'https://acme-users-api-rev.herokuapp.com/api/products',
+            'https://acme-users-api-rev.herokuapp.com/api/companies',
+            'https://acme-users-api-rev.herokuapp.com/api/offerings'
+          ];
+          Promise.all(url.map(url => axios.get(url)))
+            .then( responses => responses.map(response => response.data ))
+            .then( ([ companies, products, offerings ]) => this.setState({ companies, products, offerings }))
+        }
+        render() {
+          const { companies, products, offerings } = this.state;
+          return (
+            <HashRouter>
+              <Route render={ ({ location }) => <Nav path={ location.pathname } products = { products } companies = { companies } /> } />
+                <Switch>
+                  <Route path = '/products' render={ () => <Products products={products} /> } />
+                  <Route path = '/companies' render={ () => <Companies companies={companies} /> } />
+                  <Redirect to = '/companies' />
+                </Switch>
+            </HashRouter>
+          );
+        }
+      }
 
       const root = document.querySelector('#root');
       render(<App />, root)
