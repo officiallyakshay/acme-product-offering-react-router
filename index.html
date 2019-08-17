@@ -8,7 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-router-dom/5.0.1/react-router-dom.js"></script>
   <style>
     body {
-      font-family: Geneva, Tahoma, sans-serif;
+      font-family: 'Oswald';
     }
     .nav {
       display: flex;
@@ -32,14 +32,14 @@
         const { createElement, Component } = React;
         const { HashRouter, Link, Route, Switch, Redirect } = ReactRouterDOM;
 
-      const Nav = ( { products, companies } ) => {
+      const Nav = ( { companies, products } ) => {
         const path = location.pathname;
         return (
           <div>
             <div className='nav'>
               <h1>Acme Offerings* React</h1>
-              <Link to='/products' className={ path === '/products' ? 'selected' : ''}>Products</Link>
               <Link to='/companies' className={ path === '/companies' ? 'selected' : ''}>Companies</Link>
+              <Link to='/products' className={ path === '/products' ? 'selected' : ''}>Products</Link>
             </div>
           </div>
         );
@@ -56,12 +56,12 @@
         );
       }
 
-      const Products = ({ products }) => {
+      const Products = ({ products, companies, offerings }) => {
         return (
           <div>
             <h1>Products</h1>
             {
-              products.map( product => <li key={ product.id }> { product.name }</li> )
+              products.map( product => <ul key={ product.id }> <li> { product.name } </li> <h4> { `$ ${product.suggestedPrice}.00` } </h4> <h4> { product.description } </h4> <h4> { ` Offered By: ${companies.map( company => offerings.map(offering => offering.companyId === company.id))} ` } </h4> </ul>)
             }
           </div>
         );
@@ -79,8 +79,8 @@
       
         componentDidMount() {
           const url = [
-            'https://acme-users-api-rev.herokuapp.com/api/products',
             'https://acme-users-api-rev.herokuapp.com/api/companies',
+            'https://acme-users-api-rev.herokuapp.com/api/products',
             'https://acme-users-api-rev.herokuapp.com/api/offerings'
           ];
           Promise.all(url.map(url => axios.get(url)))
@@ -93,8 +93,8 @@
             <HashRouter>
               <Route render={ ({ location }) => <Nav path={ location.pathname } products = { products } companies = { companies } /> } />
                 <Switch>
-                  <Route path = '/products' render={ () => <Products products={products} /> } />
                   <Route path = '/companies' render={ () => <Companies companies={companies} /> } />
+                  <Route path = '/products' render={ () => <Products products={products} /> } />
                   <Redirect to = '/companies' />
                 </Switch>
             </HashRouter>
