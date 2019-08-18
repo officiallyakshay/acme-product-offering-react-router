@@ -79,19 +79,19 @@
         const processed = products.map( product => {
           const _offerings = offerings.filter( offering => offering.productId === product.id)
             .map( offering => {
-              return {...offering, product: products.find( product => product.id === offering.productId) }
+              return {...offering, company: companies.find( company => company.id === offering.companyId) }
             });
             return {...product, offerings: _offerings};
         });
         return (
           <ul>
           {
-            processed.map( company => <li key={company.id}>
-              {company.name}
+            processed.map( product => <li key={ product.id }>
+              {product.name}
               <br />
-              $ { company.suggestedPrice }.00
+              $ { product.suggestedPrice }.00
               <br />
-              {company.description}
+              {product.description}
               <br />
               Offerings:
               <ul>
